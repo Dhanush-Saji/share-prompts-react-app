@@ -7,6 +7,7 @@ import Image from 'next/image';
 const Nav = () => {
   const isUserLoggedIn = true;
   const [providers, setproviders] = useState(null)
+  const [istoggleDropdown, settoggleDropdown] = useState(false)
   useEffect(()=>{
     const setProviders = async () =>{
       const response = await getProviders()
@@ -20,6 +21,7 @@ const Nav = () => {
         <Image src='/assets/images/logo.svg' alt='logo' width={'30'} height={'30'} className='object-contain' />
         <p className='logo_text'>Promtopia</p>
       </Link>
+      {/* Desktop Navigation */}
       <div className='hidden md:flex'>
         {
           isUserLoggedIn?(
@@ -34,12 +36,47 @@ const Nav = () => {
             <>
             {
               Object.values(providers).map((provider)=>(
-                <button></button>
+                <button type='button' key = {provider.name} onClick={()=>signin(provider.id)}>Sign in</button>
               ))
             }
             </>
           )
         }
+      </div>
+      {/* Mobile Navigation */}
+      <div className='sm:hidden flex relative'>
+        {
+          isUserLoggedIn?(
+            <div className='flex'>
+             <Image src='/assets/images/logo.svg' alt='profile' width={37} height={37} className='rounded-full' onClick={()=>settoggleDropdown((prev)=>!prev)} />
+             {
+              istoggleDropdown && (
+                <div className='dropdown'>
+                  <Link href='/profile' className='dropdown_link' onClick={()=>settoggleDropdown(false)}>
+                    My Profile
+                  </Link>
+                  <Link href='/create-prompt' className='dropdown_link' onClick={()=>settoggleDropdown(false)}>
+                    Create Prompt
+                  </Link>
+                  <button className='mt-5 w-full black_btn' type='button' onClick={()=>{
+                    settoggleDropdown(false);
+                    signout()
+                  }}>Sign Out</button>
+                </div>
+              )
+             }
+            </div>
+          ):(
+            <>
+            {
+              Object.values(providers).map((provider)=>(
+                <button type='button' key = {provider.name} onClick={()=>signin(provider.id)}>Sign in</button>
+              ))
+            }
+            </>
+          )
+        }
+
       </div>
     </nav>
   )
