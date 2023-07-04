@@ -1,19 +1,19 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import {signin,signout,useSession,getProviders} from 'next-auth/react';
+import {signIn,signOut,useSession,getProviders} from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const {data:sessionData} = useSession()
   const [providers, setproviders] = useState(null)
   const [istoggleDropdown, settoggleDropdown] = useState(false)
   useEffect(()=>{
-    const setProviders = async () =>{
+    const setProvidersFn = async () =>{
       const response = await getProviders()
       setproviders(response)
     }
-    setproviders()
+    setProvidersFn()
   },[])
   return (
     <nav className='flex-between w-full mb-16 pt-3'>
@@ -24,19 +24,19 @@ const Nav = () => {
       {/* Desktop Navigation */}
       <div className='hidden md:flex'>
         {
-          isUserLoggedIn?(
+          sessionData?.user?(
             <div className='flex gap-3 md:gap-5'>
               <Link href='/create-prompt' className='black_btn'>Create Post</Link>
-              <button type='button' onClick={signout} className='outline_btn'>Sign Out</button>
+              <button type='button' onClick={signOut} className='outline_btn'>Sign Out</button>
               <Link href='profile'>
-                <Image src='/assets/images/logo.svg' alt='profile' width={37} height={37} className='rounded-full' />
+                <Image src={sessionData?.user?.image} alt='profile' width={37} height={37} className='rounded-full' />
               </Link>
             </div>
           ):(
             <>
             {
-              Object.values(providers).map((provider)=>(
-                <button type='button' key = {provider.name} onClick={()=>signin(provider.id)}>Sign in</button>
+              providers && Object.values(providers).map((provider)=>(
+                <button className='black_btn' type='button' key = {provider.name} onClick={()=>signIn(provider.id)}>Sign in</button>
               ))
             }
             </>
@@ -46,9 +46,9 @@ const Nav = () => {
       {/* Mobile Navigation */}
       <div className='sm:hidden flex relative'>
         {
-          isUserLoggedIn?(
+          sessionData?.user?(
             <div className='flex'>
-             <Image src='/assets/images/logo.svg' alt='profile' width={37} height={37} className='rounded-full' onClick={()=>settoggleDropdown((prev)=>!prev)} />
+             <Image src={sessionData?.user?.image} alt='profile' width={37} height={37} className='rounded-full' onClick={()=>settoggleDropdown((prev)=>!prev)} />
              {
               istoggleDropdown && (
                 <div className='dropdown'>
@@ -58,9 +58,9 @@ const Nav = () => {
                   <Link href='/create-prompt' className='dropdown_link' onClick={()=>settoggleDropdown(false)}>
                     Create Prompt
                   </Link>
-                  <button className='mt-5 w-full black_btn' type='button' onClick={()=>{
+                  <button className='mt-5 w-full outline_btn' type='button' onClick={()=>{
                     settoggleDropdown(false);
-                    signout()
+                    signOut()
                   }}>Sign Out</button>
                 </div>
               )
@@ -69,8 +69,8 @@ const Nav = () => {
           ):(
             <>
             {
-              Object.values(providers).map((provider)=>(
-                <button type='button' key = {provider.name} onClick={()=>signin(provider.id)}>Sign in</button>
+              providers && Object.values(providers).map((provider)=>(
+                <button className='black_btn' type='button' key = {provider.name} onClick={()=>signIn(provider.id)}>Sign in</button>
               ))
             }
             </>

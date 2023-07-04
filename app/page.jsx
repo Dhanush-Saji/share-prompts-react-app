@@ -16,3 +16,9 @@ const Home = () => {
 }
 
 export default Home
+
+// To get NEXTAUTH_SECRET, enter the below command in the website
+// openssl rand -base64 32
+// https://www.cryptool.org/en/cto/openssl
+
+// add http://localhost:3000/api/auth/callback/google in the google auth
